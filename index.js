@@ -29,9 +29,18 @@ async function run() {
 
         const classesCollection = client.db('musicSchool').collection('classes');
         const teachersCollection = client.db('musicSchool').collection('teachers');
+        const usersCollection = client.db('musicSchool').collection('users');
+
+        //user collection
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user);
+            res.send(result)
+        })
+        //user collection
 
         // class collection
-        app.get('/classes', async(req,res) => {
+        app.get('/classes', async (req, res) => {
             const cursor = classesCollection.find();
             const result = await cursor.toArray();
             res.send(result)
@@ -39,7 +48,7 @@ async function run() {
         // class collection
 
         // teachers collection
-        app.get('/teachers', async(req,res) => {
+        app.get('/teachers', async (req, res) => {
             const cursor = teachersCollection.find();
             const result = await cursor.toArray();
             res.send(result)
