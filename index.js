@@ -55,19 +55,29 @@ async function run() {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) };
             const updateDoc = {
-              $set: {
-                role: 'instructor'
-              }
+                $set: {
+                    role: 'instructor'
+                }
             };
             const result = await usersCollection.updateOne(filter, updateDoc);
             res.send(result);
-          });
-          
+        });
+
         app.get('/users', async (req, res) => {
             const result = await usersCollection.find().toArray();
             res.send(result)
         });
         //user collection
+
+
+        // delete user
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const result = await usersCollection.deleteOne(filter);
+            res.send(result);
+        });
+        // delete user
 
         // class collection
         app.get('/classes', async (req, res) => {
