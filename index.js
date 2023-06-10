@@ -53,6 +53,31 @@ async function run() {
             const result = await myclsCollection.insertOne(user);
             res.send(result)
         });
+
+        app.get('/mycls', async (req, res) => {
+            const cursor = myclsCollection.find();
+            const result = await cursor.toArray();
+            res.send(result)
+        });
+
+        // app.delete('/mycls/:id', async (req, res) => {
+        //     const classId = req.params.classId;
+
+        //     try {
+        //         const result = await myclsCollection.deleteOne({ classId: classId });
+        //         res.send(result);
+        //     } catch (error) {
+        //         console.log('Error deleting class:', error);
+        //         res.status(500).send({ error: 'Failed to delete class. Please try again.' });
+        //     }
+        // });
+
+        app.delete('/mycls/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const result = await myclsCollection.deleteOne(filter);
+            res.send(result);
+        });
         //mycls
         //jwt
         app.post('/jwt', (req, res) => {
@@ -146,7 +171,13 @@ async function run() {
             const cursor = teachersCollection.find();
             const result = await cursor.toArray();
             res.send(result)
-        })
+        });
+
+        app.post('/teachers', async (req, res) => {
+            const classData = req.body;
+            const result = await teachersCollection.insertOne(classData);
+            res.send(result);
+          });
         // teachers collection
 
         // Send a ping to confirm a successful connection
