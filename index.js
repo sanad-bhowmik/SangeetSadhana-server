@@ -1,9 +1,10 @@
 const express = require('express');
+const app = express();
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
-const app = express();
+const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 const port = process.env.PORT || 5000;
 
 //middleware
@@ -46,6 +47,7 @@ async function run() {
         const teachersCollection = client.db('musicSchool').collection('teachers');
         const usersCollection = client.db('musicSchool').collection('users');
         const myclsCollection = client.db('musicSchool').collection('mycls');
+        const paymentCollection = client.db('musicSchool').collection('payment');
 
         //mycls
         app.post('/mycls', async (req, res) => {
@@ -79,6 +81,33 @@ async function run() {
             res.send(result);
         });
         //mycls
+
+        //payment
+        app.post('/create-payment-intent', verifyJWT, async (req, res) => {
+            const { price } = req.body;
+            const amount = price * 100;
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: amount,
+                currency: 'usd',
+                payment_method_types: ['card']
+            });
+            res.send({
+                clientSecret: paymentIntent.client_secret
+            })
+        });
+
+        app.post('/payments', async(req, res) => {
+            const payment = req.body;
+            const result = await paymentCollection.insertOne(payment);
+            res.send(result)
+        });
+
+        app.get('/payments', async (req, res) => {
+            const cursor = paymentCollection.find();
+            const result = await cursor.toArray();
+            res.send(result)
+        })
+        //payment
         //jwt
         app.post('/jwt', (req, res) => {
             const user = req.body;
@@ -177,7 +206,7 @@ async function run() {
             const classData = req.body;
             const result = await teachersCollection.insertOne(classData);
             res.send(result);
-          });
+        });
         // teachers collection
 
         // Send a ping to confirm a successful connection
