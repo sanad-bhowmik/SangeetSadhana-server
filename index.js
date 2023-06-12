@@ -48,6 +48,55 @@ async function run() {
         const usersCollection = client.db('musicSchool').collection('users');
         const myclsCollection = client.db('musicSchool').collection('mycls');
         const paymentCollection = client.db('musicSchool').collection('payment');
+        const addclsCollection = client.db('musicSchool').collection('addcls');
+
+
+        // addcls
+        app.post('/addcls', async (req, res) => {
+            const user = req.body;
+            const result = await addclsCollection.insertOne(user);
+            res.send(result)
+        });
+
+        app.get('/addcls', async (req, res) => {
+            const cursor = addclsCollection.find();
+            const result = await cursor.toArray();
+            res.send(result)
+        });
+
+
+        // Fetch a single class
+        app.get('/addcls/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const result = await addclsCollection.findOne(filter);
+            res.send(result);
+        });
+
+        app.patch('/addcls/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: id };
+            const updateDoc = {
+              $set: req.body, // Use req.body directly as the update document
+            };
+          
+            try {
+              const existingDoc = await addclsCollection.findOne(filter);
+              if (!existingDoc) {
+                return res.status(404).send({ error: 'Class not found.' });
+              }
+          
+              const result = await addclsCollection.updateOne(filter, updateDoc);
+              res.send(result);
+            } catch (error) {
+              console.log('Error updating class:', error);
+              res.status(500).send({ error: 'Failed to update class. Please try again.' });
+            }
+          });
+          
+          
+        // addcls
+
 
         //mycls
         app.post('/mycls', async (req, res) => {
@@ -76,7 +125,7 @@ async function run() {
 
         app.delete('/mycls/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = { _id: new ObjectId(id) };
+            const filter = { _id: id };
             const result = await myclsCollection.deleteOne(filter);
             res.send(result);
         });
@@ -96,7 +145,7 @@ async function run() {
             })
         });
 
-        app.post('/payments', async(req, res) => {
+        app.post('/payments', async (req, res) => {
             const payment = req.body;
             const result = await paymentCollection.insertOne(payment);
             res.send(result)
