@@ -74,27 +74,27 @@ async function run() {
 
         app.patch('/addcls/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = { _id: new ObjectId(id) };
+            const filter = { _id: id };
             const updateDoc = {
-              $inc: { availableSeats: -1 }, // Decrease availableSeats by 1
+                $inc: { availableSeats: -1 }, // Decrease availableSeats by 1
             };
-          
+
             try {
-              const existingDoc = await addclsCollection.findOne(filter);
-              if (!existingDoc) {
-                return res.status(404).send({ error: 'Class not found.' });
-              }
-          
-              const result = await addclsCollection.updateOne(filter, updateDoc);
-              res.send(result);
+                const existingDoc = await addclsCollection.findOne(filter);
+                if (!existingDoc) {
+                    return res.status(404).send({ error: 'Class not found.' });
+                }
+
+                const result = await addclsCollection.updateOne(filter, updateDoc);
+                return res.send(result);
             } catch (error) {
-              console.log('Error updating class:', error);
-              res.status(500).send({ error: 'Failed to update class. Please try again.' });
+                console.log('Error updating class:', error);
+                res.status(500).send({ error: 'Failed to update class. Please try again.' });
             }
-          });
-          
-          
-          
+        });
+
+
+
         // addcls
 
 
