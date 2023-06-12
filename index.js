@@ -41,7 +41,6 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
 
         const classesCollection = client.db('musicSchool').collection('classes');
         const teachersCollection = client.db('musicSchool').collection('teachers');
@@ -75,9 +74,9 @@ async function run() {
 
         app.patch('/addcls/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = { _id: id };
+            const filter = { _id: new ObjectId(id) };
             const updateDoc = {
-              $set: req.body, // Use req.body directly as the update document
+              $inc: { availableSeats: -1 }, // Decrease availableSeats by 1
             };
           
             try {
@@ -93,6 +92,7 @@ async function run() {
               res.status(500).send({ error: 'Failed to update class. Please try again.' });
             }
           });
+          
           
           
         // addcls
@@ -259,7 +259,7 @@ async function run() {
         // teachers collection
 
         // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
+        // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
